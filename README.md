@@ -12,10 +12,10 @@ All data is placing in csv files:
 
 After starting the script there will be input for user
 
-User input examples:
+Possible user input cases:
 - "what services you have?"
 - "what slots I can book for haircut tomorrow?"
-- "book haircut at 10:00"
+- "i want to book haircut from 9:00"
 
 
 # Environment
