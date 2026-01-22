@@ -168,6 +168,8 @@ if __name__ == '__main__':
                 record = action["args"]
                 create_record(record)
                 tool_result = {"result": "Record created"}
+            case "error":
+                tool_result = {"error": action["args"]["message"]}
             case "terminate":
                 print(action["args"]["message"])
                 break
