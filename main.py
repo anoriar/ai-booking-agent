@@ -2,6 +2,7 @@ import csv
 import uuid
 from datetime import datetime
 import json
+from json import JSONDecodeError
 from os import terminal_size
 
 from dotenv import load_dotenv
@@ -244,29 +245,28 @@ if __name__ == '__main__':
             tool = agent_response.tool_calls[0]
             tool_name = tool.function.name
             tool_args = json.loads(tool.function.arguments)
-        except Exception as e:
+        except JSONDecodeError as e:
             result = {"error": str(e)}
             continue
 
         print(f"Tool name: {tool_name}")
         print(f"Tool args: {tool_args}")
 
-        if tool_name == "terminate":
-            print(f"Termination message: {tool_args['message']}")
-            break
-        elif tool_name in tool_functions:
-            try:
-                match tool_name:
-                    case 'create_record':
-                        create_record(tool_args['service_id'], tool_args['slot'])
-                        result = {"result": "Record created successfully"}
-                    case _:
-                        result = {"result": tool_functions[tool_name](**tool_args)}
+        try:
+            match tool_name:
+                case "terminate":
+                    print(f"Termination message: {tool_args['message']}")
+                    break
+                case 'create_record':
+                    create_record(tool_args['service_id'], tool_args['slot'])
+                    result = {"result": "Record created successfully"}
+                case 'list_services' | 'list_records':
+                    result = {"result": tool_functions[tool_name](**tool_args)}
+                case _:
+                    result = {"error": f"Unknown tool: {tool_name}"}
+        except Exception as e:
+            result = {"error": str(e)}
 
-            except Exception as e:
-                result = {"error": str(e)}
-        else:
-            result = {"error": f"Unknown tool: {tool_name}"}
 
         print(f"Result: {result}")
 
